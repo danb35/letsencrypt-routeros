@@ -32,16 +32,17 @@ sudo -s
 cd /opt
 git clone https://github.com/gitpel/letsencrypt-routeros
 ```
-Edit the settings file:
+Make a working copy of the settings file example, then edit the copy:
 ```sh
+cp /opt/letsencrypt-routeros/letsencrypt-routeros.settings_example /opt/letsencrypt-routeros/letsencrypt-routeros.settings
 vim /opt/letsencrypt-routeros/letsencrypt-routeros.settings
 ```
 | Variable Name | Value | Description |
 | ------ | ------ | ------ |
 | ROUTEROS_USER | admin | user with admin rights to connect to RouterOS |
-| ROUTEROS_HOST | 10.0.254.254 | RouterOS\Mikrotik IP |
-| ROUTEROS_SSH_PORT | 22 | RouterOS\Mikrotik PORT |
-| ROUTEROS_PRIVATE_KEY | /opt/letsencrypt-routeros/id_rsa | Private RSA Key to connecto to RouterOS |
+| ROUTEROS_HOST | 10.0.254.254 | RouterOS\Mikrotik IP or hostname |
+| ROUTEROS_SSH_PORT | 22 | RouterOS\Mikrotik SSH port.  Defaults to 22 if not set. |
+| ROUTEROS_PRIVATE_KEY | /opt/letsencrypt-routeros/id_rsa | Private RSA Key to connecto to RouterOS.  Defaults to `/opt/letsencrypt-routeros/id_rsa` if not set. |
 | DOMAIN | mydomain.com | Use main domain for wildcard certificate or subdomain for subdomain certificate |
 
 Generate RSA Key for RouterOS
@@ -83,6 +84,7 @@ add-apt-repository ppa:certbot/certbot
 apt update
 apt install certbot -y
 ```
+For other versions or distros, consult the (certbot docs)[https://certbot.eff.org/instructions] for installation instructions.
 
 ***In the first time, you will need to create Certificates manually and put domain TXT record***
 

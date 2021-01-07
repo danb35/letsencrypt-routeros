@@ -1,5 +1,7 @@
 #!/bin/bash
 CONFIG_FILE=letsencrypt-routeros.settings
+ROUTEROS_SSH_PORT=22
+ROUTEROS_PRIVATE_KEY=/opt/letsencrypt-routeros/id_rsa
 
 while getopts c: o
 do	case "$o" in
@@ -18,13 +20,13 @@ fi
 source $CONFIG_FILE
 
 if [[ -z $ROUTEROS_USER ]] || [[ -z $ROUTEROS_HOST ]] || [[ -z $ROUTEROS_SSH_PORT ]] || [[ -z $ROUTEROS_PRIVATE_KEY ]] || [[ -z $DOMAIN ]]; then
-        echo "Check the config file $CONFIG_FILE or start with params: $0 [RouterOS User] [RouterOS Host] [SSH Port] [SSH Private Key] [Domain]"
+        echo "Check the config file $CONFIG_FILE and ensure all parameters are set."
         echo "Please avoid spaces"
         exit 1
 fi
 
-CERTIFICATE=/etc/letsencrypt/live/$DOMAIN/fullchain.pem
-KEY=/etc/letsencrypt/live/$DOMAIN/privkey.pem
+CERTIFICATE=/etc/letsencrypt/live/"$DOMAIN"/fullchain.pem
+KEY=/etc/letsencrypt/live/"$DOMAIN"/privkey.pem
 
 echo ""
 echo "Updating certificate for $DOMAIN"
