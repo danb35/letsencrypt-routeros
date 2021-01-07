@@ -23,7 +23,7 @@ if [[ -z $ROUTEROS_USER ]] || [[ -z $ROUTEROS_HOST ]] || [[ -z $ROUTEROS_SSH_POR
         exit 1
 fi
 
-CERTIFICATE=/etc/letsencrypt/live/$DOMAIN/cert.pem
+CERTIFICATE=/etc/letsencrypt/live/$DOMAIN/fullchain.pem
 KEY=/etc/letsencrypt/live/$DOMAIN/privkey.pem
 
 echo ""
