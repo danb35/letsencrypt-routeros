@@ -5,6 +5,8 @@
 
 *UPD 2019-07-11: Works with OpenSSH 7+*
 
+*UPD 2021-01-07: Optionally set config file (to support deploying certs to multiple routers)*
+
 [![Mikrotik](https://i.mt.lv/mtv2/logo.svg)](https://mikrotik.com/)
 
 
@@ -42,11 +44,6 @@ vim /opt/letsencrypt-routeros/letsencrypt-routeros.settings
 | ROUTEROS_PRIVATE_KEY | /opt/letsencrypt-routeros/id_rsa | Private RSA Key to connecto to RouterOS |
 | DOMAIN | mydomain.com | Use main domain for wildcard certificate or subdomain for subdomain certificate |
 
-
-Change permissions:
-```sh
-chmod +x /opt/letsencrypt-routeros/letsencrypt-routeros.sh
-```
 Generate RSA Key for RouterOS
 
 *Make sure to leave the passphrase blank (-N "")*
@@ -100,11 +97,12 @@ certbot certonly --preferred-challenges=dns --manual -d $DOMAIN --manual-public-
 ```sh
 ./opt/letsencrypt-routeros/letsencrypt-routeros.sh
 ```
-*To use script without settings file:*
 
+*To specify an alternate settings file:*
 ```sh
-./opt/letsencrypt-routeros/letsencrypt-routeros.sh [RouterOS User] [RouterOS Host] [SSH Port] [SSH Private Key] [Domain]
+./opt/letsencrypt-routeros/letsencrypt-routeros.sh -c /path/to/settings/file
 ```
+
 *To use script with CertBot hooks for wildcard domain:*
 ```sh
 certbot certonly --preferred-challenges=dns --manual -d *.$DOMAIN --manual-public-ip-logging-ok --post-hook /opt/letsencrypt-routeros/letsencrypt-routeros.sh --server https://acme-v02.api.letsencrypt.org/directory

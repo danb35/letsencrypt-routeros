@@ -1,16 +1,21 @@
 #!/bin/bash
 CONFIG_FILE=letsencrypt-routeros.settings
 
-if [[ -z $1 ]] || [[ -z $2 ]] || [[ -z $3 ]] || [[ -z $4 ]] || [[ -z $5 ]]; then
-        echo -e "Usage: $0 or $0 [RouterOS User] [RouterOS Host] [SSH Port] [SSH Private Key] [Domain]\n"
-        source $CONFIG_FILE
-else
-        ROUTEROS_USER=$1
-        ROUTEROS_HOST=$2
-        ROUTEROS_SSH_PORT=$3
-        ROUTEROS_PRIVATE_KEY=$4
-        DOMAIN=$5
+while getopts c: o
+do	case "$o" in
+	c)	CONFIG_FILE="$OPTARG";;
+	[?])	echo >&2 "Usage: $0 [-c config_file]"
+		exit 1;;
+	esac
+done
+
+if [ ! -f $CONFIG_FILE ]; then
+	echo -e "\nConfiguration file not found:\n$CONFIG_FILE\n"
+	echo "Please create it and try again"
+	exit 1
 fi
+
+source $CONFIG_FILE
 
 if [[ -z $ROUTEROS_USER ]] || [[ -z $ROUTEROS_HOST ]] || [[ -z $ROUTEROS_SSH_PORT ]] || [[ -z $ROUTEROS_PRIVATE_KEY ]] || [[ -z $DOMAIN ]]; then
         echo "Check the config file $CONFIG_FILE or start with params: $0 [RouterOS User] [RouterOS Host] [SSH Port] [SSH Private Key] [Domain]"
