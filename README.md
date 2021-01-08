@@ -30,7 +30,7 @@ Download the repo to your system
 ```sh
 sudo -s
 cd /opt
-git clone https://github.com/gitpel/letsencrypt-routeros
+git clone https://github.com/danb35/letsencrypt-routeros
 ```
 Make a working copy of the settings file example, then edit the copy:
 ```sh
