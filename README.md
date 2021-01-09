@@ -44,6 +44,8 @@ vim /opt/letsencrypt-routeros/letsencrypt-routeros.settings
 | ROUTEROS_SSH_PORT | 22 | RouterOS\Mikrotik SSH port.  Defaults to 22 if not set. |
 | ROUTEROS_PRIVATE_KEY | /opt/letsencrypt-routeros/id_rsa | Private RSA Key to connecto to RouterOS.  Defaults to `/opt/letsencrypt-routeros/id_rsa` if not set. |
 | DOMAIN | mydomain.com | Use main domain for wildcard certificate or subdomain for subdomain certificate |
+| CERTIFICATE | | Path to the full certificate chain file.  Defaults to `/etc/letsencrypt/live/"$DOMAIN"/fullchain.pem` if not set. |
+| KEY | | Path to the certificate private key file.  Defaults to `/etc/letsencrypt/live/"$DOMAIN"/privkey.pem` if not set. |
 
 Generate RSA Key for RouterOS
 
@@ -84,35 +86,20 @@ add-apt-repository ppa:certbot/certbot
 apt update
 apt install certbot -y
 ```
-For other versions or distros, consult the (certbot docs)[https://certbot.eff.org/instructions] for installation instructions.
+For other versions or distros, consult the [certbot docs](https://certbot.eff.org/instructions) for installation instructions.
 
-***In the first time, you will need to create Certificates manually and put domain TXT record***
+### Obtain and install the certificate
+In the following commands, replace $DOMAIN with the domain name for your device.
+`certbot certonly --preferred-challenges=dns --manual -d $DOMAIN --post-hook /opt/letsencrypt-routeros/letsencrypt-routeros.sh`
 
-*follow CertBot instructions*
-```sh
-source /opt/letsencrypt-routeros/letsencrypt-routeros.settings
-certbot certonly --preferred-challenges=dns --manual -d $DOMAIN --manual-public-ip-logging-ok
-```
+To specify an alternate configuration file:
+`certbot certonly --preferred-challenges=dns --manual -d $DOMAIN --post-hook "/opt/letsencrypt-routeros/letsencrypt-routeros.sh -c /path/to/config/file"`
 
-### Usage of the script
-*To use settings from the settings file:*
-```sh
-./opt/letsencrypt-routeros/letsencrypt-routeros.sh
-```
+The commands above will obtain the cert using manual DNS validation, which will require you to manually update your domain's DNS records each time a certificate is requested.  For obvious reasons, this won't renew automatically.  A better solution, if you're using a DNS provider supported by one of [certbot's DNS plugins](https://certbot.eff.org/docs/using.html#dns-plugins), would be to use an appropriate plugin so that certbot can automatically make the appropriate changes.  This will allow for automated renewal.
 
-*To specify an alternate settings file:*
-```sh
-./opt/letsencrypt-routeros/letsencrypt-routeros.sh -c /path/to/settings/file
-```
+If your DNS provider isn't supported by one of certbot's plugins, consider using a different client.  acme.sh, for example, has [extensive DNS support](https://github.com/acmesh-official/acme.sh/wiki/dnsapi).  If using an alternate client, consult its documentation for the way to call this script once a cert is issued or renewed (for acme.sh, you'd use `--reloadcmd /opt/letsencrypt-routeros/letsencrypt-routeros.sh`).
 
-*To use script with CertBot hooks for wildcard domain:*
-```sh
-certbot certonly --preferred-challenges=dns --manual -d *.$DOMAIN --manual-public-ip-logging-ok --post-hook /opt/letsencrypt-routeros/letsencrypt-routeros.sh --server https://acme-v02.api.letsencrypt.org/directory
-```
-*To use script with CertBot hooks for subdomain:*
-```sh
-certbot certonly --preferred-challenges=dns --manual -d $DOMAIN --manual-public-ip-logging-ok --post-hook /opt/letsencrypt-routeros/letsencrypt-routeros.sh
-```
+If using a client other than certbot, be aware that it may store its certificate files in a different location.  In that case, you'll need to set the CERTIFICATE and KEY variables in your config file.  Please make sure that CERTIFICATE points to the full chain (i.e., your server cert and the intermediate CA cert combined into a single file).  With certbot, this file is called fullchain.pem; with acme.sh, it's called fullchain.cer.  For other clients, consult your documentation.
 
 ---
 ### Licence MIT
