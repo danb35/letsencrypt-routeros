@@ -62,18 +62,30 @@ scp -P $ROUTEROS_SSH_PORT /opt/letsencrypt-routeros/id_rsa.pub "$ROUTEROS_USER"@
 ```
 
 ### Setup RouterOS / Mikrotik side
-*Check that user is the same as in the settings file letsencrypt-routeros.settings*
-
 *Check Mikrotik ssh port in /ip services ssh*
 
 *Check Mikrotik firewall to accept on SSH port*
+
+For security reasons, these instructions will create a user and group with the minimal permissions needed to run this script.  This user will only be able to log in via SSH, not via the web interface, and will only be able to log in with the private key generated above.  Run these commands on the Mikrotik box--either via SSH, or using the Terminal in WebFig:
+
 ```sh
 :put "Enable SSH"
 /ip service enable ssh
 
+:put "Create group"
+/user group add name=SSH policy=ssh,read,write,ftp
+
+:put "Create user"
+/user add name=ssh_user group=SSH password=Sup3rStr0ngPassw0rd
+
 :put "Add to the user RSA Public Key"
-/user ssh-keys import user=admin public-key-file=id_rsa.pub
+/user ssh-keys import user=ssh_user public-key-file=id_rsa.pub
+
+:put "Disable password login via SSH"
+/ip ssh set always-allow-password-login=no
 ```
+
+Once these steps are finished, edit the config file to specify the correct username.
 
 ### CertBot Let's Encrypt
 Install CertBot using official manuals https://certbot.eff.org/#ubuntuxenial-other
